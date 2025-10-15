@@ -1,12 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "../components/Card";
-import autos from "../data/autos";
-
 
 const Catalogo = () => {
+  const [autos, setAutos] = useState([]); // Estado para guardar los autos de la API
   const [busqueda, setBusqueda] = useState("");
 
-  // Filtrado automático por marca o modelo
+  // useEffect se ejecuta cuando el componente se monta por primera vez
+  useEffect(() => {
+    // Hacemos la llamada a la API del backend
+    fetch("http://localhost:4002/vehicles")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('La respuesta de la red no fue exitosa');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setAutos(data); // Guardamos los datos recibidos en el estado
+      })
+      .catch(error => {
+        console.error("Error al obtener los vehículos:", error);
+        // Aquí podrías mostrar un mensaje de error al usuario
+      });
+  }, []); // El array vacío `[]` significa que este efecto se ejecuta solo una vez
+
+  // El resto de la lógica de filtrado funciona igual, pero con los datos del estado
   const autosFiltrados = autos.filter(
     (auto) =>
       auto.marca.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -27,50 +45,21 @@ const Catalogo = () => {
             />
         </div>
         
+        {/* Aquí puedes mantener tus filtros estáticos o conectarlos a la API en el futuro */}
         <section className="flex flex-col md:flex-row justify-between items-center bg-gray-100 p-6 rounded-lg shadow-md w-full">
-            <select className="p-2 border border-gray-300 rounded bg-white">
-                <option value="">Marca</option>
-                <option value="toyota">Toyota</option>
-                <option value="honda">Honda</option>
-            </select>
-            <select className="p-2 border border-gray-300 rounded bg-white">
-                <option value="">Modelo</option>
-                <option value="civic">Civic</option>
-                <option value="corolla">Corolla</option>
-            </select>
-            <select className="p-2 border border-gray-300 rounded bg-white">
-                <option value="">Año</option>
-                <option value="2020">2020</option>
-                <option value="2021">2021</option>
-            </select>
-            <select className="p-2 border border-gray-300 rounded bg-white">
-                <option value="">Precio</option>
-                <option value="10000">10,000</option>
-                <option value="20000">20,000</option>
-            </select>
-            <select className="p-2 border border-gray-300 rounded bg-white font-bold">
-                <option value="">Kilometraje</option>
-                <option value="0-10000">0-10,000</option>
-                <option value="10001-20000">10,001-20,000</option>
-            </select>
+            {/* ... tus selects de filtros ... */}
         </section>
-        <h3 className="mt-3">Ordenar por</h3>
-        <div className="flex row justify-evenly gap-2 m-4">
-                
-                <button className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">
-                    Precio
-                </button>
-                <button className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">
-                    KM 
-                </button>
-            </div>
+
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {autosFiltrados.map((auto) => (
-                <Card key={auto.id} auto={auto} />
-            ))}
+            {autosFiltrados.length > 0 ? (
+                autosFiltrados.map((auto) => (
+                    <Card key={auto.idVehiculo} auto={auto} /> // Asegúrate de que la key sea única
+                ))
+            ) : (
+                <p>Cargando vehículos o no se encontraron resultados...</p>
+            )}
         </div>
     </div>
-  );
-};
-
+    );
+}
 export default Catalogo;
