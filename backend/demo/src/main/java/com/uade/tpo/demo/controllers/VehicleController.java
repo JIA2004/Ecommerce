@@ -66,10 +66,8 @@ public class VehicleController {
             Vehiculo updatedVehicle = vehicleService.updateVehicleImage(id, image);
             return ResponseEntity.ok(updatedVehicle);
         } catch (RuntimeException e) {
-            // Esto se activará si el vehículo no se encuentra
             return ResponseEntity.notFound().build();
         } catch (IOException e) {
-            // Esto se activará si hay un problema al leer la imagen
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -79,9 +77,13 @@ public class VehicleController {
         return vehicleService.getVehicleById(id).map(vehicle -> {
             vehicle.setMarca(vehicleDetails.getMarca());
             vehicle.setModelo(vehicleDetails.getModelo());
-            // ... (copia aquí el resto de los setters como los tenías)
+            vehicle.setColor(vehicleDetails.getColor());
+            vehicle.setAnio(vehicleDetails.getAnio());
+            vehicle.setKilometraje(vehicleDetails.getKilometraje());
+            vehicle.setPrecioBase(vehicleDetails.getPrecioBase());
+            vehicle.setStock(vehicleDetails.getStock());
             vehicle.setCategory(vehicleDetails.getCategory());
-            
+
             Vehiculo updatedVehicle = vehicleService.saveVehicle(vehicle);
             return ResponseEntity.ok(updatedVehicle);
         }).orElse(ResponseEntity.notFound().build());

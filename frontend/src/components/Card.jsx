@@ -19,8 +19,9 @@ const Card = ({ auto }) => {
         <div className={`bg-gray-900 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition ${sinStock ? 'opacity-50' : ''}`}>
           <img className="w-full h-48 object-cover" src={auto.imagen} alt={`${auto.marca} ${auto.modelo}`} />
           <div className="p-4">
-            <h3 className="text-white font-semibold text-lg">{`${auto.marca} ${auto.modelo}`}</h3>
-            <p className="text-gray-400 text-sm">{`${auto.año}, ${auto.kilometraje} km`}</p>
+              <h3 className="text-white font-semibold text-lg">{`${auto.marca} ${auto.modelo}`}</h3>
+              {/* Cambiamos "año" por "anio" para que coincida con el backend */}
+              <p className="text-gray-400 text-sm">{`${auto.anio}, ${auto.kilometraje.toLocaleString()} km`}</p>
           </div>
         </div>
       </Link>

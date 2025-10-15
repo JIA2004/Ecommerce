@@ -45,4 +45,10 @@ public class Vehiculo {
     @ManyToOne(fetch = FetchType.EAGER) 
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @Column(name = "anio")
+    private Integer anio;
+
+    @Column(name = "kilometraje")
+    private Integer kilometraje;
 }
