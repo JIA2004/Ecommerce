@@ -4,27 +4,21 @@ import { Link } from 'react-router-dom';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useCarrito();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const credentials = { username, password };
 
-    fetch('http://localhost:4002/api/v1/auth/authenticate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Usuario o contraseña incorrectos.');
-        }
-        return response.json();
-    })
+    fetch('http://localhost:4002/api/v1/auth/authenticate', { /* ... */ })
+    .then(response => response.json())
     .then(data => {
-        localStorage.setItem('accessToken', data.access_token);
-        console.log('Login exitoso, token guardado:', data.access_token);
+        login(data.access_token);
+
         alert('¡Bienvenido!');
+        navigate('/');
     })
     .catch(error => {
         console.error('Error en el login:', error);
@@ -42,7 +36,7 @@ const Login = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Nombre de usuario" // Cambiado de correo
+              placeholder="Nombre de usuario"
               className="w-full border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
