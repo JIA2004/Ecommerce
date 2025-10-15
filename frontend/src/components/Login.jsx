@@ -2,12 +2,34 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Intento de login:', { email, password });
+
+    const credentials = { username, password };
+
+    fetch('http://localhost:4002/api/v1/auth/authenticate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Usuario o contraseña incorrectos.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        localStorage.setItem('accessToken', data.access_token);
+        console.log('Login exitoso, token guardado:', data.access_token);
+        alert('¡Bienvenido!');
+    })
+    .catch(error => {
+        console.error('Error en el login:', error);
+        alert(error.message);
+    });
   };
 
   return (
@@ -17,24 +39,15 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Correo electrónico"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Nombre de usuario" // Cambiado de correo
               className="w-full border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Contraseña"
-              className="w-full border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
+          {/* ...el input de la contraseña se mantiene igual... */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition"

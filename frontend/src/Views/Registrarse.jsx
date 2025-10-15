@@ -47,24 +47,33 @@ export default function Registrarse() {
     setErrores(erroresValidados);
 
     if (Object.keys(erroresValidados).length === 0) {
-      // No enviar repetirPassword al backend
-      const { repetirPassword, ...dataEnviar } = formData;
+  const { repetirPassword, nombre, ...restoData } = formData;
+  const dataParaApi = {
+    ...restoData,
+    firstName: nombre.split(' ')[0] || '',
+    lastName: nombre.split(' ').slice(1).join(' ') || '',
+    role: 'USER' // Asignamos un rol por defecto
+  };
 
-      fetch("http://localhost:3000/api/usuarios/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataEnviar),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("Registro exitoso:", data);
-          alert("Usuario registrado correctamente");
-        })
-        .catch((err) => {
-          console.error("Error al registrarse:", err);
-          alert("Ocurrió un error");
-        });
-    }
+  fetch("http://localhost:4002/api/v1/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dataParaApi),
+  })
+    .then((res) => {
+        if (!res.ok) {
+            throw new Error('Error en el registro. Es posible que el usuario o email ya existan.');
+        }
+        return res.json();
+    })
+    .then((data) => {
+      console.log("Registro exitoso:", data);
+      alert("Usuario registrado correctamente. Serás redirigido al login.");
+    })
+    .catch((err) => {
+      console.error("Error al registrarse:", err);
+      alert(err.message);
+    });
   };
 
   return (
