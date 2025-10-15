@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.demo.repository.VehicleRepository;
-import com.uade.tpo.demo.entity.Vehiculo;
 
 @Service
 @RequiredArgsConstructor

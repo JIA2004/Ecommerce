@@ -41,10 +41,10 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-    @Column(name = "firstName", nullable = false)   // <- CLAVE
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "lastName", nullable = false)    // <- CLAVE
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @Column(name = "documento", nullable = false, unique = true)
