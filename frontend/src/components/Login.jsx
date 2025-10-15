@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCarrito } from '../context/CarritoContext';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -9,14 +10,19 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const credentials = { username, password };
 
-    fetch('http://localhost:4002/api/v1/auth/authenticate', { /* ... */ })
-    .then(response => response.json())
+    fetch('http://localhost:4002/api/v1/auth/authenticate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Usuario o contraseña incorrectos.');
+        return response.json();
+    })
     .then(data => {
         login(data.access_token);
-
         alert('¡Bienvenido!');
         navigate('/');
     })

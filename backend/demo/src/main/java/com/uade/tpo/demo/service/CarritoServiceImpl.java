@@ -19,13 +19,17 @@ import java.util.stream.Collectors;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uade.tpo.demo.repository.VehicleRepository;
+import com.uade.tpo.demo.entity.Vehiculo;
+
 @Service
 @RequiredArgsConstructor
 public class CarritoServiceImpl implements CarritoService {
 
     private final CarritoRepository carritoRepository;
     private final CarritoVehiculoRepository itemRepository;
-    private final PedidoRepository pedidoRepository; // ✅ agregado
+    private final PedidoRepository pedidoRepository;
+    private final VehicleRepository vehicleRepository;
 
     @Override
     public Carrito createCarrito(Carrito carrito) {
@@ -83,7 +87,7 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Transactional
     @Override
-    public Pedido confirmarCarritoYGenerarPedido(Long carritoId, FormaDePago formaDePago) { // Añadimos FormaDePago como parámetro
+    public Pedido confirmarCarritoYGenerarPedido(Long carritoId, FormaDePago formaDePago) {
         Carrito carrito = carritoRepository.findByIdWithItems(carritoId)
                 .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
 
@@ -95,24 +99,33 @@ public class CarritoServiceImpl implements CarritoService {
             throw new RuntimeException("El carrito está vacío, no se puede generar un pedido.");
         }
 
+        for (CarritoVehiculo item : carrito.getCarritoVehiculos()) {
+            Vehiculo vehiculo = item.getVehiculo();
+            int cantidadPedida = item.getCantidad();
+
+            if (vehiculo.getStock() < cantidadPedida) {
+                throw new RuntimeException("No hay stock suficiente para el vehículo: " + vehiculo.getMarca() + " " + vehiculo.getModelo());
+            }
+            vehiculo.setStock(vehiculo.getStock() - cantidadPedida);
+            vehicleRepository.save(vehiculo);
+        }
+
         carrito.setEstado("CONFIRMADO");
         carritoRepository.save(carrito);
 
-        // Calcular el costo total sumando el valor de cada item (valor * cantidad)
         double total = carrito.getCarritoVehiculos().stream()
             .mapToDouble(item -> item.getValor() * item.getCantidad())
             .sum();
             
-        // Extraer todos los vehículos del carrito
         List<Vehiculo> vehiculosDelPedido = carrito.getCarritoVehiculos().stream()
             .map(CarritoVehiculo::getVehiculo)
             .collect(Collectors.toList());
 
         Pedido pedido = Pedido.builder()
             .cliente(carrito.getCliente())
-            .vehiculos(vehiculosDelPedido) // Usamos la lista completa de vehículos
+            .vehiculos(vehiculosDelPedido)
             .costoTotal(total)
-            .formaDePago(formaDePago) // Asignamos la forma de pago
+            .formaDePago(formaDePago)
             .estado("PENDIENTE_PAGO")
             .build();
 

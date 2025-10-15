@@ -1,37 +1,53 @@
 import React from "react";
 import { useCarrito } from "../context/CarritoContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { fetchConToken } from "../api/api";
 
 export default function Carrito() {
-  const { carrito, quitarDelCarrito, vaciarCarrito } = useCarrito();
+  const { carrito, quitarDelCarrito, isAuthenticated } = useCarrito();
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (!carrito || !carrito.idCarrito) return;
+    const formaDePago = { formaDePago: "TARJETA" }; // Simulación
+
+    fetchConToken(`/carritos/${carrito.idCarrito}/checkout`, 'POST', formaDePago)
+      .then(pedidoGenerado => {
+        alert("¡Compra realizada con éxito! Tu pedido ha sido generado.");
+        navigate('/');
+        window.location.reload(); // Forzamos recarga para actualizar todo
+      })
+      .catch(error => {
+        console.error("Error en el checkout:", error);
+        alert("Hubo un problema al procesar tu compra. Es posible que no haya stock suficiente.");
+      });
+  };
+
+  if (!isAuthenticated) {
+    // ... (código para usuario no logueado)
+  }
+
+  if (!carrito || !carrito.items) {
+    return <p className="mt-20">Cargando carrito...</p>;
+  }
 
   return (
     <div className="max-w-2xl mx-auto mt-20 bg-white p-8 rounded shadow min-h-[300px]">
       <h2 className="text-2xl font-bold mb-6">Carrito de compras</h2>
-      {carrito.length === 0 ? (
+      {carrito.items.length === 0 ? (
         <p className="text-gray-600">El carrito está vacío.</p>
       ) : (
         <>
           <ul>
-            {carrito.map((auto) => (
-              <li key={auto.id} className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <img
-                    src={auto.imagen}
-                    alt={`${auto.marca} ${auto.modelo}`}
-                    className="w-20 h-16 object-cover rounded"
-                  />
-                  <Link
-                    to={`/catalogo/${auto.id}`}
-                    className="font-semibold text-blue-600 hover:underline"
-                  >
-                    {auto.marca} {auto.modelo} {auto.año}
-                  </Link>
-                  <span className="ml-2 text-gray-500">{auto.kilometraje.toLocaleString()} km</span>
+            {carrito.items.map((item) => (
+              <li key={item.id} className="flex items-center justify-between mb-4">
+                <div>
+                  <span className="font-semibold">Vehículo ID: {item.vehiculoId}</span>
+                  <span className="ml-4 text-gray-500">Valor: ${item.valor.toFixed(2)}</span>
                 </div>
                 <button
                   className="text-red-500 hover:underline"
-                  onClick={() => quitarDelCarrito(auto.id)}
+                  onClick={() => quitarDelCarrito(item.id)}
                 >
                   Quitar
                 </button>
@@ -39,14 +55,8 @@ export default function Carrito() {
             ))}
           </ul>
           <button
-            className="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-            onClick={vaciarCarrito}
-          >
-            Vaciar carrito
-          </button>
-          <button
-            className="mt-4 ml-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            onClick={() => alert("¡Compra realizada!")}
+            className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            onClick={handleCheckout}
           >
             Comprar
           </button>
