@@ -62,15 +62,16 @@ public class VehicleController {
     public ResponseEntity<Vehiculo> updateVehicleImage(
             @PathVariable Long id,
             @RequestParam("image") MultipartFile image) {
-        return vehicleService.getVehicleById(id).map(vehicle -> {
-            try {
-                vehicle.setImagen(image.getBytes());
-                Vehiculo updatedVehicle = vehicleService.saveVehicle(vehicle);
-                return ResponseEntity.ok(updatedVehicle);
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-        }).orElse(ResponseEntity.notFound().build());
+        try {
+            Vehiculo updatedVehicle = vehicleService.updateVehicleImage(id, image);
+            return ResponseEntity.ok(updatedVehicle);
+        } catch (RuntimeException e) {
+            // Esto se activará si el vehículo no se encuentra
+            return ResponseEntity.notFound().build();
+        } catch (IOException e) {
+            // Esto se activará si hay un problema al leer la imagen
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PutMapping("/{id}")

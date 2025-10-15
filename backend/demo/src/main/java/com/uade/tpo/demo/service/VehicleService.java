@@ -6,6 +6,10 @@ import com.uade.tpo.demo.entity.Vehiculo;
 import com.uade.tpo.demo.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -40,4 +44,16 @@ public class VehicleService {
     public void deleteVehicle(Long id) {
         vehicleRepository.deleteById(id);
     }
+
+    @Transactional
+    public Vehiculo updateVehicleImage(Long id, MultipartFile image) throws IOException {
+        
+        Vehiculo vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehiculo no encontrado con id " + id));
+
+        vehicle.setImagen(image.getBytes());
+
+        return vehicle;
+    }
+
 }
