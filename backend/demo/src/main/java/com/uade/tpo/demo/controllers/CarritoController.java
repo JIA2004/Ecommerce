@@ -5,12 +5,16 @@ import com.uade.tpo.demo.entity.CarritoVehiculo;
 import com.uade.tpo.demo.dto.CarritoDTO;
 import com.uade.tpo.demo.dto.CarritoVehiculoDTO;
 import com.uade.tpo.demo.entity.Pedido;
+import com.uade.tpo.demo.entity.User;
 import com.uade.tpo.demo.service.CarritoService;
 import com.uade.tpo.demo.repository.FormaDePagoRepository;
 import com.uade.tpo.demo.entity.FormaDePago;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -81,4 +85,13 @@ public class CarritoController {
         }
         return dto;
     }
+
+    @GetMapping("/mine")
+    public ResponseEntity<CarritoDTO> getMyCarrito(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Carrito carrito = carritoService.getOrCreateCarritoForUser(user);
+        return ResponseEntity.ok(mapToDto(carrito));
+}
 }

@@ -12,4 +12,5 @@ public interface CarritoRepository extends JpaRepository<Carrito, Long> {
 	// Load carrito with its items and the associated vehiculo in one query
 	@Query("select c from Carrito c left join fetch c.carritoVehiculos iv left join fetch iv.vehiculo where c.idCarrito = :id")
 	Optional<Carrito> findByIdWithItems(@Param("id") Long id);
+	Optional<Carrito> findByClienteIdClienteAndEstado(Long clienteId, String estado);
 }

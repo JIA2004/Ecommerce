@@ -4,6 +4,7 @@ import com.uade.tpo.demo.entity.Carrito;
 import com.uade.tpo.demo.entity.CarritoVehiculo;
 import com.uade.tpo.demo.entity.FormaDePago;
 import com.uade.tpo.demo.entity.Pedido;
+import com.uade.tpo.demo.entity.User;
 import com.uade.tpo.demo.entity.Vehiculo;
 import com.uade.tpo.demo.repository.CarritoRepository;
 import com.uade.tpo.demo.repository.CarritoVehiculoRepository;
@@ -116,5 +117,18 @@ public class CarritoServiceImpl implements CarritoService {
             .build();
 
         return pedidoRepository.save(pedido);
+    }
+
+    @Override
+    @Transactional
+    public Carrito getOrCreateCarritoForUser(User user) {
+        return carritoRepository.findByClienteIdClienteAndEstado(user.getIdCliente(), "ABIERTO")
+                .orElseGet(() -> {
+                    Carrito newCarrito = Carrito.builder()
+                            .cliente(user)
+                            .estado("ABIERTO")
+                            .build();
+                    return carritoRepository.save(newCarrito);
+                });
     }
 }
