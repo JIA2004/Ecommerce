@@ -25,7 +25,9 @@ public class VehicleService {
     }
 
     public List<Vehiculo> getAllVehicles() {
-        return vehicleRepository.findAll();
+    return vehicleRepository.findAll().stream()
+            .filter(vehiculo -> vehiculo.getStock() != null && vehiculo.getStock() > 0)
+            .collect(java.util.stream.Collectors.toList());
     }
 
     public Optional<Vehiculo> getVehicleById(Long id) {
@@ -47,7 +49,7 @@ public class VehicleService {
 
     @Transactional
     public Vehiculo updateVehicleImage(Long id, MultipartFile image) throws IOException {
-        
+
         Vehiculo vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vehiculo no encontrado con id " + id));
 

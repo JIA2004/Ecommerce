@@ -33,7 +33,8 @@ public class Vehiculo {
     @Column(name = "precio_base")
     private Float precioBase;
 
-    private Boolean disponible;
+    @Column(name = "stock", nullable = false)
+    private Integer stock;
 
     @Lob
     @Column(name = "imagen", columnDefinition = "LONGBLOB")

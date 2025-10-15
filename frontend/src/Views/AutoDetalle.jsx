@@ -14,12 +14,18 @@ export default function AutoDetalle() {
       <img src={auto.imagen} alt={`${auto.marca} ${auto.modelo}`} className="w-full h-64 object-cover rounded mb-4" />
       <h2 className="text-2xl font-bold mb-2">{auto.marca} {auto.modelo} {auto.año}</h2>
       <p className="mb-2 text-gray-700">Kilometraje: {auto.kilometraje.toLocaleString()} km</p>
+
+      {/* Mostramos el stock disponible */}
+      <p className="mb-4 font-semibold">Stock disponible: {auto.stock > 0 ? `${auto.stock} unidades` : "Agotado"}</p>
+
       <p className="mb-4 text-gray-600">{auto.descripcion}</p>
+
       <button
-        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+        className={`px-6 py-2 rounded text-white transition ${auto.stock > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
         onClick={() => agregarAlCarrito(auto)}
+        disabled={auto.stock === 0}
       >
-        Agregar al carrito
+        {auto.stock > 0 ? "Agregar al carrito" : "Sin stock"}
       </button>
     </div>
   );
